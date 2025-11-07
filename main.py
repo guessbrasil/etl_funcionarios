@@ -8,6 +8,8 @@ from config import settings
 from etl.reader import read_excel_file
 from etl.transformer import transform_dataframe
 from etl.loader import load_to_database
+from sqlalchemy import create_engine
+from urllib.parse import quote_plus
 
 os.makedirs(settings.LOG_DIR, exist_ok=True)
 os.makedirs(settings.ENTRADA_DIR, exist_ok=True)
@@ -18,6 +20,18 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
+
+connection_string = (
+    f"DRIVER={settings.DB_CONFIG['driver']};"
+    f"SERVER={settings.DB_CONFIG['servidor']};"
+    f"DATABASE={settings.DB_CONFIG['banco']};"
+    f"UID={settings.DB_CONFIG['usuario']};"
+    f"PWD={settings.DB_CONFIG['senha']}"
+)
+
+conn_str = f"mssql+pyodbc:///?odbc_connect={quote_plus(connection_string)}"
+engine = create_engine(conn_str)
+
 
 def process_file(filepath):
     logging.info(f"Iniciando processamento do arquivo: {filepath}")
